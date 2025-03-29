@@ -1,0 +1,29 @@
+<sl-dialog open label="Terminez la configuration de votre compte" class="dialog-header-actions">
+  <div class="p-4">
+    <p class="text-gray-700 text-sm mb-4">
+      Merci d'indiquer votre nom ainsi que votre prénom pour finaliser la configuration de votre compte.
+    </p>
+
+    <!-- Form -->
+    <form action="/configuration-compte" method="POST" class="space-y-4">
+      <!-- First Name Input -->
+      <div>
+        <label for="firstName" class="block text-sm font-medium text-gray-600 mb-1">Prénom</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Entrez votre prénom" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+      </div>
+
+      <!-- Last Name Input -->
+      <div>
+        <label for="lastName" class="block text-sm font-medium text-gray-600 mb-1">Nom</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Entrez votre nom" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end">
+        <button type="submit" class="px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300">
+          Confirmer
+        </button>
+      </div>
+    </form>
+  </div>
+</sl-dialog>

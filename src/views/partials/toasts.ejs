@@ -1,0 +1,72 @@
+<script>
+  document.toast = (function () {
+    const validTypes = ['primary', 'success', 'neutral', 'warning', 'danger'];
+    const MAX_NOTIFICATIONS = 4;
+    const toastArray = []; // Array to keep track of active toasts
+
+    return function (type, title, message) {
+      if (!validTypes.includes(type)) {
+        console.error('Invalid toast type. Please use one of:', validTypes.join(', '));
+        return;
+      }
+
+      let toastStack = document.querySelector('sl-toast-stack');
+      if (!toastStack) {
+        toastStack = document.createElement('sl-toast-stack');
+        document.body.appendChild(toastStack);
+      }
+
+      // Remove the oldest toast if the limit is reached
+      if (toastArray.length >= MAX_NOTIFICATIONS) {
+        const oldestToast = toastArray.shift(); // Remove the oldest toast from the array
+        oldestToast.hide(); // Hide the toast (graceful removal)
+      }
+
+      const toast = document.createElement('sl-alert');
+      toast.setAttribute('variant', type);
+      toast.setAttribute('duration', '6000'); // Toast will disappear after 6 seconds
+      toast.setAttribute('closable', '');
+      toast.setAttribute('countdown', 'rtl');
+
+      const icon = document.createElement('sl-icon');
+      icon.setAttribute('slot', 'icon');
+      icon.setAttribute(
+        'name',
+        type === 'success'
+          ? 'check2-circle'
+          : type === 'warning'
+          ? 'exclamation-triangle'
+          : type === 'danger'
+          ? 'exclamation-octagon'
+          : 'info-circle'
+      );
+
+      const content = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.innerText = title;
+      const paragraph = document.createElement('p');
+      paragraph.innerText = message;
+
+      content.appendChild(strong);
+      content.appendChild(paragraph);
+
+      toast.appendChild(icon);
+      toast.appendChild(content);
+
+      toastStack.appendChild(toast);
+
+      // Add the toast to the array
+      toastArray.push(toast);
+
+      const tryShowToast = () => {
+        if (typeof toast.toast === 'function') {
+          toast.toast();
+        } else {
+          setTimeout(tryShowToast, 100);
+        }
+      };
+
+      tryShowToast();
+    };
+  })();
+</script>

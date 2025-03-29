@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/shoelace-autoloader.js"></script>
+  <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss-with-forms.js"></script>
+  <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss-with-typography.js"></script>
+  <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss-with-aspect-ratio.js"></script>
+  <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss-with-container-queries.js"></script>
+  <script src="https://unpkg.com/tailwindcss-cdn@3.4.10/tailwindcss-with-all-plugins.js"></script>
+  <%- include('../partials/toasts'); -%>
+  <%- include('../partials/style'); -%>
+</head>
+
+<% if (typeof user !== "undefined" && (typeof user.nom !== "string" || typeof user.prenom !== "string")) { %>
+<%- include('../partials/account-setup-modal'); -%>
+<% } %>

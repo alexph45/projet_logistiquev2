@@ -1,0 +1,116 @@
+<%- include('../../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+          <sl-tab-group>
+
+            <% 
+                const activeMembers = members.filter(member => member.status === true); 
+                const pendingMembers = members.filter(member => member.status === false);
+            %>
+
+            <sl-tab slot="nav" panel="active_members">Membres actifs (<%= activeMembers.length %>)</sl-tab>
+            <sl-tab slot="nav" panel="inactive_members">Membres en attente (<%= pendingMembers.length %>)</sl-tab>
+
+            <sl-tab-panel name="active_members">
+
+              <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom <i class="fa-solid fa-file-signature"></i></th>
+                      <th>Adresse email <i class="fa-solid fa-envelope"></i></th>
+                      <th>Statut <i class="fa-solid fa-signal"></i></th>
+                      <th>Permissions <i class="fa-solid fa-id-badge"></i></th>
+                      <th>Actions <i class="fa-solid fa-gear"></i></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% activeMembers.forEach(member => { %>
+                    <tr>
+                      <td>
+                        <% if (typeof member.nom === "string" && typeof member.prenol === "string") { %>
+                        <%= member.nom.toUpperCase() %> <%= member.prenom.charAt(0).toUpperCase() + member.prenom.slice(1).toLowerCase() %>
+                        <% } else { %>
+                        Non configuré
+                        <% } %>
+                      </td>
+                      <td><%= member.email %></td>
+                      <td><%= member.status ? "Actif" : "Inactif" %></td>
+                      <td><%= member.permissions.join(", ") %></td>
+                      <td>
+                        <sl-button-group label="Alignment">
+                          <sl-button variant="primary" onclick="window.location.href='/admin/membres/<%= member.id %>'">Modifier</sl-button>
+                          <sl-button variant="danger">Supprimer</sl-button>
+                        </sl-button-group>
+                      </td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+            </sl-tab-panel>
+
+            <sl-tab-panel name="inactive_members">
+
+              <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom <i class="fa-solid fa-file-signature"></i></th>
+                      <th>Adresse email <i class="fa-solid fa-envelope"></i></th>
+                      <th>Statut <i class="fa-solid fa-signal"></i></th>
+                      <th>Permissions <i class="fa-solid fa-id-badge"></i></th>
+                      <th>Actions <i class="fa-solid fa-gear"></i></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% pendingMembers.forEach(member => { %>
+                    <tr>
+                      <td>
+                        <% if (typeof member.nom === "string" && typeof member.prenol === "string") { %>
+                        <%= member.nom.toUpperCase() %> <%= member.prenom.charAt(0).toUpperCase() + member.prenom.slice(1).toLowerCase() %>
+                        <% } else { %>
+                        Non disponible, le compte n'a pas été approuvé
+                        <% } %>
+                      </td>
+                      <td><%= member.email %></td>
+                      <td><%= member.status ? "Actif" : "Inactif" %></td>
+                      <td><%= member.permissions.join(", ") %></td>
+                      <td>
+                        <sl-button-group label="Alignment">
+                          <sl-button variant="success">Approuver</sl-button>
+                          <sl-button variant="danger">Refuser</sl-button>
+                        </sl-button-group>
+                      </td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+            </sl-tab-panel>
+
+          </sl-tab-group>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>

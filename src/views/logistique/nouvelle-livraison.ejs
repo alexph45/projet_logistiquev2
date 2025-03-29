@@ -1,0 +1,43 @@
+<%- include('../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+          <form action="/logistique/nouvelle-livraison" method="POST">
+
+            <sl-select required id="camionSelect" hoist style="border: none; margin-left: 10px; margin-right: 10px;" label="Camion" help-text="Le camion utilisé pour la livraison" name="camion">
+              <% camions.forEach(cam => { %>
+              <sl-option value="<%= cam.id %>"><%= cam.marque %> - <%= cam.modele %></sl-option>
+              <% }) %>
+            </sl-select>
+
+            <sl-select required id="chauffeurSelect" hoist style="border: none; margin-left: 10px; margin-right: 10px;" label="Chauffeur" help-text="Le chauffeur effectuant la livraison" name="chauffeur">
+              <% utilisateurs.forEach(user => { %>
+              <sl-option value="<%= user.id %>"><%= user.nom.toUpperCase() %> <%= user.prenom.charAt(0).toUpperCase() + user.prenom.slice(1).toLowerCase() %></sl-option>
+              <% }) %>
+            </sl-select>
+
+            <sl-input type="datetime-local" style="border: none;" label="Date et heure de début de la livraison" name="date_debut"></sl-input>
+
+            <sl-input type="datetime-local" style="border: none;" label="Date et heure de fin de la livraison" name="date_fin"></sl-input>
+
+            <!-- Submit Button -->
+            <sl-button style="border: none; margin-left: 10px; margin-right: 10px;" variant="primary" type="submit">Créer la livraison</sl-button>
+
+          </form>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>

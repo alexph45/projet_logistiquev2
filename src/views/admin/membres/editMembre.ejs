@@ -1,0 +1,59 @@
+<%- include('../../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+          <sl-tab-group>
+            <sl-tab slot="nav" panel="general">Informations</sl-tab>
+            <sl-tab slot="nav" panel="permissions">Permissions</sl-tab>
+
+            <sl-tab-panel name="general">
+
+              <sl-input style="border: none;" label="Nom" help-text="Nom de famille de l'utilisateur" value="<%= utilisateurInfo.nom || "Non configuré" %>">
+              </sl-input>
+
+              <sl-input style="border: none;" label="Prénom" help-text="Prénom de l'utilisateur" value="<%= utilisateurInfo.prenom || "Non configuré" %>">
+              </sl-input>
+
+            </sl-tab-panel>
+
+            <sl-tab-panel name="permissions">
+              
+              <sl-select value="<%= utilisateurInfo.permissions.join(" ") %>" hoist style="border: none;" label="Permissions" help-text="Les différentes permissions dont l'utilisateur dispose" multiple clearable>
+              
+                <small>Permissions de logisticien</small>
+                <sl-option value="VIEW_DELIVERIES">Voir la liste des livraisons</sl-option>
+                <sl-option value="MANAGE_DELIVERIES">Gérer les livraisons</sl-option>
+
+                <small>Permissions des membres</small>
+                <sl-option value="VIEW_MEMBERS">Voir la liste des membres</sl-option>
+                <sl-option value="MANAGE_MEMBERS">Gérer les membres</sl-option>
+
+                <small>Permissions des camions</small>
+                <sl-option value="VIEW_TRUCKS">Voir la liste des camions</sl-option>
+                <sl-option value="MANAGE_TRUCKS">Gérer les camions</sl-option>
+
+                <small>Autre(s)</small>
+                <sl-option disabled value="ADMIN">Administrateur (possède toutes les permissions)</sl-option>
+
+              </sl-select>
+
+            </sl-tab-panel>
+
+          </sl-tab-group>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>

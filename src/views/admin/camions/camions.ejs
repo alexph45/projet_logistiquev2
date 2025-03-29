@@ -1,0 +1,201 @@
+<%- include('../../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+          <sl-tab-group>
+
+            <sl-tab slot="nav" panel="camions">Liste des camions</sl-tab>
+            <sl-tab slot="nav" panel="camions_add">Ajouter un camion</sl-tab>
+
+            <sl-tab-panel name="camions">
+
+              <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Marque</th>
+                      <th>Modèle</th>
+                      <th>Immatriculation</th>
+                      <th>Poids</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% camions.forEach(camion => { %>
+                    <tr>
+                      <td><%= camion.marque %></td>
+                      <td><%= camion.modele %></td>
+                      <td><%= camion.immatriculation %></td>
+                      <td><%= camion.poids %> tonnes</td>
+                      <td>
+                        <sl-button-group label="Alignment">
+                          <sl-button variant="primary" onclick="window.location.href='/admin/camions/<%= camion.id %>'">Modifier</sl-button>
+                          <sl-button variant="danger">Supprimer</sl-button>
+                        </sl-button-group>
+                      </td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+            </sl-tab-panel>
+
+            <sl-tab-panel name="camions_add">
+
+              <form action="/camions" method="POST" id="truckForm">
+
+                <!-- Marque Select -->
+                <sl-select required id="marqueSelect" hoist style="border: none; margin-left: 10px; margin-right: 10px;" label="Marque" help-text="La marque du camion" name="marque">
+                  <small>Fabricants européens</small>
+                  <sl-option value="VOLVO">Volvo</sl-option>
+                  <sl-option value="MERCEDES">Mercedes-Benz</sl-option>
+                  <sl-option value="RENAULT">Renault</sl-option>
+
+                  <small>Fabricants américains</small>
+                  <sl-option value="FREIGHTLINER">Freightliner</sl-option>
+                  <sl-option value="KENWORTH">Kenworth</sl-option>
+
+                  <small>Fabricants de camions électriques</small>
+                  <sl-option value="TESLA">Tesla</sl-option>
+
+                  <small>Autre(s)</small>
+                  <sl-option value="AUTRE">Autre</sl-option>
+                </sl-select>
+
+                <!-- Modèle Select -->
+                <sl-select required hoist style="border: none; margin-left: 10px; margin-right: 10px;" label="Modèle" help-text="Le modèle du camion" id="modeleSelect" name="modele">
+                  <!-- Options will be populated based on marque selection -->
+                </sl-select>
+
+                <!-- Immatriculation Input -->
+                <sl-input required style="border: none;" label="Immatriculation" help-text="Immatriculation du véhicule" name="immatriculation"></sl-input>
+
+                <!-- Poids Input -->
+                <sl-input required step="0.1" type="number" style="border: none;" label="Poids" help-text="Poids du véhicule, en tonnes" name="poids"></sl-input>
+
+                <!-- Submit Button -->
+                <sl-button style="border: none; margin-left: 10px; margin-right: 10px;" variant="primary" type="submit">Ajouter le camion</sl-button>
+
+              </form>
+
+            </sl-tab-panel>
+
+          </sl-tab-group>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mapping of brands to models
+    const models = {
+      VOLVO: [{
+          value: "VOLVO_VNL",
+          label: "Volvo VNL"
+        },
+        {
+          value: "VOLVO_VNR",
+          label: "Volvo VNR"
+        },
+        {
+          value: "VOLVO_VHD",
+          label: "Volvo VHD"
+        }
+      ],
+      MERCEDES: [{
+          value: "MERCEDES_BENZ_ACTROS",
+          label: "Mercedes-Benz Actros"
+        },
+        {
+          value: "MERCEDES_BENZ_Antos",
+          label: "Mercedes-Benz Antos"
+        },
+        {
+          value: "MERCEDES_BENZ_Arocs",
+          label: "Mercedes-Benz Arocs"
+        }
+      ],
+      RENAULT: [{
+          value: "RENAULT_T",
+          label: "Renault T"
+        },
+        {
+          value: "RENAULT_K",
+          label: "Renault K"
+        },
+        {
+          value: "RENAULT_C",
+          label: "Renault C"
+        }
+      ],
+      FREIGHTLINER: [{
+          value: "FREIGHTLINER_CASCADIA",
+          label: "Freightliner Cascadia"
+        },
+        {
+          value: "FREIGHTLINER_CORONADO",
+          label: "Freightliner Coronado"
+        },
+        {
+          value: "FREIGHTLINER_M2",
+          label: "Freightliner M2"
+        }
+      ],
+      KENWORTH: [{
+          value: "KENWORTH_T680",
+          label: "Kenworth T680"
+        },
+        {
+          value: "KENWORTH_T880",
+          label: "Kenworth T880"
+        },
+        {
+          value: "KENWORTH_W990",
+          label: "Kenworth W990"
+        }
+      ],
+      TESLA: [{
+        value: "TESLA_SEMI",
+        label: "Tesla Semi"
+      }]
+    };
+
+    // Reference to the marque and modele select elements
+    const marqueSelect = document.getElementById("marqueSelect");
+    const modeleSelect = document.getElementById("modeleSelect");
+
+    // Event listener for marque select change
+    marqueSelect.addEventListener("sl-change", function (event) {
+      const selectedMarque = event.target.value;
+      const modelsForSelectedMarque = models[selectedMarque] || [];
+
+      console.log(modelsForSelectedMarque);
+
+      // Clear existing options
+      modeleSelect.innerHTML = "";
+
+      // Add the new options for the selected marque
+      modelsForSelectedMarque.forEach(model => {
+        const option = document.createElement("sl-option");
+        option.setAttribute("value", model.value);
+        option.textContent = model.label;
+        modeleSelect.appendChild(option);
+      });
+    });
+  </script>
+</body>

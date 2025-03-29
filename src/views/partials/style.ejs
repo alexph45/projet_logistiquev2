@@ -1,0 +1,70 @@
+<style>
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+    background-color: #ffffff;
+    /* White background */
+    border: 2px solid #dcdcdc;
+    /* Outer border in light grey */
+  }
+
+  th,
+  td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+    /* Light grey border for each cell */
+  }
+
+  th {
+    background-color: #6b7280;
+    /* Modern green background for headers */
+    color: white;
+    font-weight: bold;
+  }
+
+  td {
+    background-color: #fafafa;
+    /* Very light grey background for cells */
+    color: #333333;
+    /* Dark grey text color */
+  }
+
+  tr:hover td {
+    background-color: #f0f0f0;
+    /* Subtle hover effect with light grey */
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+    /* Remove the bottom border for the last row */
+  }
+
+  /* Remove the left border for the first column */
+  td:first-child,
+  th:first-child {
+    border-left: none;
+  }
+
+  /* Remove the top border for the first row */
+  th:first-child {
+    border-top: none;
+  }
+
+  /* Responsive styling */
+  @media (max-width: 768px) {
+
+    th,
+    td {
+      padding: 10px;
+    }
+
+    table {
+      margin: 10px;
+    }
+  }
+</style>

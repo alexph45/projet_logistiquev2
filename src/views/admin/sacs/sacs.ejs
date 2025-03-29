@@ -1,0 +1,43 @@
+<%- include('../../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+            <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom <i class="fa-solid fa-file-signature"></i></th>
+                      <th>Adresse email <i class="fa-solid fa-envelope"></i></th>
+                      <th>Statut <i class="fa-solid fa-signal"></i></th>
+                      <th>Permissions <i class="fa-solid fa-id-badge"></i></th>
+                      <th>Actions <i class="fa-solid fa-gear"></i></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% sacs.forEach((sac, index) => { %>
+                    <tr>
+                      <td>dsqddqsd</td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>

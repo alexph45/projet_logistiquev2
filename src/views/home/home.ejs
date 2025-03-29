@@ -1,0 +1,35 @@
+<%- include('../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+          <sl-tab-group>
+            <sl-tab slot="nav" panel="general">Livraisons en cours</sl-tab>
+            <sl-tab slot="nav" panel="custom">Livraisons terminées</sl-tab>
+
+            <sl-tab-panel name="general">
+
+              <sl-alert open>
+                <sl-icon slot="icon" name="info-circle"></sl-icon>
+                Aucune livraison ne vous a encore été attribuée.
+              </sl-alert>
+
+            </sl-tab-panel>
+
+          </sl-tab-group>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>

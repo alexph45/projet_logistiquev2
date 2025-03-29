@@ -1,0 +1,278 @@
+<%- include('../partials/head'); -%>
+<style>
+  sl-dialog::part(panel) {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scanner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70vw;  /* 70% de la largeur de l'écran */
+    height: 70vh; /* 70% de la hauteur de l'écran */
+    max-width: 100%; 
+    max-height: 100%;
+    margin: auto;
+    background: black; /* Fond noir pour mieux voir le QR code */
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  #qr-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Remplit l'espace disponible sans déformation */
+    border-radius: 10px;
+  }
+</style>
+
+<body class="h-full">
+  <div class="min-h-full">
+    <%- include('../partials/header'); -%>
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+        <%- include('../partials/sidebar'); -%>
+        <main class="col-span-10">
+
+          <sl-tab-group>
+            <sl-tab slot="nav" panel="info_livraison">Informations
+              livraison</sl-tab>
+            <sl-tab slot="nav" panel="liste_colis">Liste des
+              colis</sl-tab>
+
+            <sl-tab-panel name="info_livraison"></sl-tab-panel>
+
+            <sl-tab-panel name="liste_colis">
+
+              <sl-dialog label="Scanner un colis" class="dialog-overview" id="ajouter_colis_dialog">
+                <p id="scanner-text">Veuillez scanner le QR code du **colis**.</p>
+                <div class="scanner-container">
+                  <video id="qr-video"></video>
+                  <canvas id="qr-canvas" style="display: none;"></canvas>
+                </div>
+                <sl-button slot="footer" variant="primary" id="close-scanner">Fermer</sl-button>
+              </sl-dialog>
+
+              <!-- Nouveau dialogue pour la position du colis -->
+              <sl-dialog id="position-dialog" label="Position du colis">
+                <form id="position-form">
+                  <p>Où se situe le colis ?</p>
+                  <sl-radio-group name="position" label="Position" required id="emplacement-colis">
+                    <sl-radio value="bas">Bas</sl-radio>
+                    <sl-radio value="milieu">Milieu</sl-radio>
+                    <sl-radio value="haut">Haut</sl-radio>
+                  </sl-radio-group>
+                  <sl-button type="submit" variant="primary">Confirmer</sl-button>
+                </form>
+              </sl-dialog>
+
+              <% if (livraison.colis.length < 1) { %>
+              <sl-alert open variant="danger" style="margin-bottom: 5px;">
+                <sl-icon slot="icon" name="info-circle"></sl-icon>
+                Aucun colis n'a été attribué à cette livraison.
+              </sl-alert>
+              <% } else { %>
+
+              <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Numéro</th>
+                      <th>Poids</th>
+                      <th>Statut</th>
+                      <th>Adresse de livraison</th>
+                      <th>Sac</th>
+                      <th>Position dans le sac</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% livraison.colis.forEach((colis, index) => { %>
+                    <tr>
+                      <td>#<%= index + 1 %></td>
+                      <td><%= colis.colis.poids %> kg</td>
+                      <td><%= colis.colis.statut === "ongoing" ? "Non livré" : "Livré" %></td>
+                      <td><%= colis.colis.adresseDestinataire %></td>
+                      <td><%= colis.sac.label %></td>
+                      <td><%= colis.colis.positionSac.charAt(0).toUpperCase() + colis.colis.positionSac.slice(1).toLowerCase() %></td>
+                      <td>
+                        <% if (colis.colis.statut === "ongoing") { %>
+                         <sl-button-group label="Alignment">
+                          <sl-button variant="primary" onclick="markAsDelivered('<%= colis.colis.id %>')">Indiquer comme livré</sl-button>
+                        </sl-button-group>
+                        <% } else { %>
+                         <p>Aucune action disponible</p>
+                        <% } %>
+                      </td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+              <% } %>
+
+              <sl-button variant="primary" id="ajouter_colis_bouton">Ajouter un colis</sl-button>
+
+            </sl-tab-panel>
+
+          </sl-tab-group>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ajouter_colis_bouton = document.getElementById('ajouter_colis_bouton');
+    const ajouter_colis_dialog = document.getElementById('ajouter_colis_dialog');
+    const closeScannerButton = document.getElementById('close-scanner');
+    const scannerText = document.getElementById("scanner-text");
+    const positionDialog = document.getElementById('position-dialog');
+
+    const video = document.getElementById("qr-video");
+    const canvas = document.getElementById("qr-canvas");
+    const ctx = canvas.getContext("2d");
+
+    let stream = null;
+    let scanInterval = null;
+    let idColis = null;
+    let idSac = null;
+    let lastScanned = "";
+
+    async function startScanner() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        video.play();
+        scanInterval = setInterval(scanQRCode, 1000);
+      } catch (error) {
+        console.error("Erreur lors de l'activation du scanner:", error);
+      }
+    }
+
+    function scanQRCode() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (qrCode) {
+          let scannedData = qrCode.data.trim();
+
+          if (scannedData !== lastScanned) {
+            lastScanned = scannedData;
+
+            if (!idColis) {
+              idColis = scannedData;
+              scannerText.innerHTML = "Colis scanné ✅ <br> Maintenant, scannez le QR code du **sac**.";
+            } else if (!idSac) {
+              idSac = scannedData;
+              stopScanner();
+              ajouter_colis_dialog.hide();
+
+              positionDialog.show();  // Affiche le dialogue pour la position du colis
+
+            }
+          }
+        }
+      }
+    }
+
+    function stopScanner() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      clearInterval(scanInterval);
+      lastScanned = "";
+    }
+
+    ajouter_colis_bouton.addEventListener("click", () => {
+      idColis = null;
+      idSac = null;
+      scannerText.innerHTML = "Veuillez scanner le QR code du **colis**.";
+      ajouter_colis_dialog.show();
+      startScanner();
+    });
+
+    closeScannerButton.addEventListener("click", () => {
+      ajouter_colis_dialog.hide();
+      stopScanner();
+    });
+
+    ajouter_colis_dialog.addEventListener("sl-hide", () => {
+      stopScanner();
+    });
+
+    // Nouveau code pour gérer la position du colis
+    const positionForm = document.getElementById("position-form");
+
+    positionForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      const position = document.getElementById('emplacement-colis').value;
+
+      // Erreur si aucune position n'est sélectionnée
+      if (!position) {
+        return document.toast("danger", "Erreur", "Veuillez sélectionner une position pour le colis.");
+      }
+
+      fetch("/logistique/ajoutColis", {
+        method: "POST",
+        body: JSON.stringify({
+          idColis,
+          idSac,
+          idLivraison: "<%= livraison._doc.id %>",
+          positionSac: position
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          return document.toast("danger", "Erreur", data.message ? data.message : "Une erreur est survenue");
+        }
+        location.reload();  // Rafraîchit la page
+      })
+      .catch(error => console.error("Erreur lors de la requête:", error));
+    });
+  </script>
+  <script>
+    function markAsDelivered(idColis) {
+      fetch("/logistique/colis-delivered", {
+        method: "POST",
+        body: JSON.stringify({
+          idColis
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(!data.success){
+          return document.toast("danger", "Erreur", data.message ? data.message : "Une erreur est survenue");
+        }
+
+        // Refresh la page
+        location.reload();
+      })
+      .catch(error => console.error("Erreur lors de la requête:", error));
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+</body>

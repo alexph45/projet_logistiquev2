@@ -1,0 +1,58 @@
+<%- include('../partials/head'); -%>
+
+<body class="h-full">
+  <div class="min-h-full">
+
+    <%- include('../partials/header'); -%>
+
+    <div class="py-10">
+      <div class="mx-auto max-w-3xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-12 lg:gap-8 lg:px-8">
+
+        <%- include('../partials/sidebar'); -%>
+
+        <main class="col-span-10">
+
+            <div style="max-width: 1200px; margin: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Numéro</th>
+                      <th>Statut</th>
+                      <th>Date de début</th>
+                      <th>Date de fin</th>
+                      <th>Livreur</th>
+                      <th>Camion</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <% livraisons.forEach((delivery, index) => { %>
+                    <tr>
+                      <td>#<%= index + 1 %></td>
+                      <td>
+                        <%= delivery._doc.status === "inactive" ? "Inactive" : (delivery.status === "ongoing" ? "En cours" : "Terminée") %>
+                      </td>
+                      <td><%= new Date(delivery._doc.dateDebut).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) %></td>
+                      <td><%= new Date(delivery._doc.dateFin).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) %></td>
+                      <td><%= delivery.chauffeur.nom + " " + delivery.chauffeur.prenom %></td>
+                      <td><%= delivery.camion.modele.replaceAll("_", " ") %></td>
+                      <td>
+                        <sl-button-group label="Alignment">
+                          <sl-button variant="primary" onclick="window.location.href='/logistique/livraison?id=<%= delivery._doc.id %>'">Voir</sl-button>
+                          <sl-button variant="danger">Supprimer</sl-button>
+                        </sl-button-group>
+                      </td>
+                    </tr>
+                    <% }) %>
+
+                  </tbody>
+                </table>
+              </div>
+
+        </main>
+
+      </div>
+    </div>
+  </div>
+</body>
